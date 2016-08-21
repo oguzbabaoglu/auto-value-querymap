@@ -32,9 +32,9 @@ class MapMethod {
 
     builder.addStatement("$T queryMap = new $T<>()", METHOD_RETURN_TYPE, LinkedHashMap.class);
     for (Property p : properties) {
-      builder.beginControlFlow("if ($L() != null)", p.methodName);
+      if (!p.isPrimitive) builder.beginControlFlow("if ($L() != null)", p.methodName);
       builder.addStatement("queryMap.put($S, $T.valueOf($L()))", p.keyValue, String.class, p.methodName);
-      builder.endControlFlow();
+      if (!p.isPrimitive) builder.endControlFlow();
     }
     builder.addStatement("return queryMap");
 

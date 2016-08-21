@@ -15,6 +15,7 @@ class Property {
   final String humanName;
   final TypeName type;
   final String keyValue;
+  final boolean isPrimitive;
 
   Property(String humanName, ExecutableElement element) {
     this.methodName = element.getSimpleName().toString();
@@ -23,6 +24,8 @@ class Property {
 
     String definedKey = getKeyFromAnnotation(element);
     this.keyValue = definedKey == null ? humanName : definedKey;
+
+    this.isPrimitive = element.getReturnType().getKind().isPrimitive();
   }
 
   private String getKeyFromAnnotation(ExecutableElement element) {

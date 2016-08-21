@@ -106,6 +106,7 @@ public class AutoValueQueryMapExtensionTest {
             + "public abstract class Simple {\n"
             + "    public abstract String name();\n"
             + "    public abstract Long value();\n"
+            + "    public abstract int primitive();\n"
             + "    public abstract Map<String, String> toQueryMap();\n"
             + "}");
 
@@ -119,8 +120,8 @@ public class AutoValueQueryMapExtensionTest {
             + "import java.util.Map;\n"
             + "\n"
             + "final class AutoValue_Simple extends $AutoValue_Simple {\n"
-            + "  AutoValue_Simple(String name, Long value) {\n"
-            + "    super(name, value);\n"
+            + "  AutoValue_Simple(String name, Long value, int primitive) {\n"
+            + "    super(name, value, primitive);\n"
             + "  }\n"
             + "\n"
             + "  @Override\n"
@@ -132,6 +133,7 @@ public class AutoValueQueryMapExtensionTest {
             + "    if (value() != null) {\n"
             + "      queryMap.put(\"value\", String.valueOf(value()));\n"
             + "    }\n"
+            + "    queryMap.put(\"primitive\", String.valueOf(primitive()));\n"
             + "    return queryMap;\n"
             + "  }\n"
             + "}");
@@ -154,6 +156,7 @@ public class AutoValueQueryMapExtensionTest {
             + "public abstract class Simple {\n"
             + "    @Param(\"nameKey\") public abstract String name();\n"
             + "    @Param(\"valueKey\") public abstract Long value();\n"
+            + "    @Param(\"primitiveKey\") public abstract int primitive();\n"
             + "    public abstract Map<String, String> toQueryMap();\n"
             + "}");
 
@@ -167,8 +170,8 @@ public class AutoValueQueryMapExtensionTest {
             + "import java.util.Map;\n"
             + "\n"
             + "final class AutoValue_Simple extends $AutoValue_Simple {\n"
-            + "  AutoValue_Simple(String name, Long value) {\n"
-            + "    super(name, value);\n"
+            + "  AutoValue_Simple(String name, Long value, int primitive) {\n"
+            + "    super(name, value, primitive);\n"
             + "  }\n"
             + "\n"
             + "  @Override\n"
@@ -180,6 +183,7 @@ public class AutoValueQueryMapExtensionTest {
             + "    if (value() != null) {\n"
             + "      queryMap.put(\"valueKey\", String.valueOf(value()));\n"
             + "    }\n"
+            + "    queryMap.put(\"primitiveKey\", String.valueOf(primitive()));\n"
             + "    return queryMap;\n"
             + "  }\n"
             + "}");
