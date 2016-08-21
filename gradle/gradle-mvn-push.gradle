@@ -44,8 +44,8 @@ afterEvaluate { project ->
       name = POM_ARTIFACT_ID
       desc = POM_DESCRIPTION
       websiteUrl = POM_URL
-      issueTrackerUrl = POM_URL + '/issues'
-      vcsUrl = POM_URL + '.git'
+      issueTrackerUrl = POM_URL + 'issues'
+      vcsUrl = POM_URL.substring(0, POM_URL.length() - 1) + '.git'
       licenses = ['Apache-2.0']
       version {
         name = VERSION_NAME
