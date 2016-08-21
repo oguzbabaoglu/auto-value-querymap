@@ -18,11 +18,11 @@ import static javax.lang.model.element.Modifier.FINAL;
 public class AutoValueQueryMapExtension extends AutoValueExtension {
 
   @Override public boolean applicable(Context context) {
-    return MapMethod.filteredAbstractMethods(context).size() > 0;
+    return MapMethod.findDeclaredMethod(context).size() > 0;
   }
 
   @Override public Set<ExecutableElement> consumeMethods(Context context) {
-    return MapMethod.filteredAbstractMethods(context);
+    return MapMethod.findDeclaredMethod(context);
   }
 
   @Override public String generateClass(Context context, String className, String classToExtend, boolean isFinal) {

@@ -1,6 +1,5 @@
 package com.oguzbabaoglu.auto.value.querymap;
 
-import com.google.common.collect.ImmutableSet;
 import com.squareup.javapoet.TypeName;
 
 import java.util.LinkedList;
@@ -9,32 +8,32 @@ import java.util.Map;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
 
 class Property {
   final String methodName;
   final String humanName;
-  final ExecutableElement element;
   final TypeName type;
-  final ImmutableSet<String> annotations;
+  final String keyValue;
 
   Property(String humanName, ExecutableElement element) {
     this.methodName = element.getSimpleName().toString();
     this.humanName = humanName;
-    this.element = element;
+    this.type = TypeName.get(element.getReturnType());
 
-    type = TypeName.get(element.getReturnType());
-    annotations = buildAnnotations(element);
+    String definedKey = getKeyFromAnnotation(element);
+    this.keyValue = definedKey == null ? humanName : definedKey;
   }
 
-  private ImmutableSet<String> buildAnnotations(ExecutableElement element) {
-    ImmutableSet.Builder<String> builder = ImmutableSet.builder();
-
+  private String getKeyFromAnnotation(ExecutableElement element) {
     List<? extends AnnotationMirror> annotations = element.getAnnotationMirrors();
     for (AnnotationMirror annotation : annotations) {
-      builder.add(annotation.getAnnotationType().asElement().getSimpleName().toString());
+      if (Param.class.getCanonicalName().equals(
+          ((TypeElement) annotation.getAnnotationType().asElement()).getQualifiedName().toString())) {
+        return (String) annotation.getElementValues().values().iterator().next().getValue();
+      }
     }
-
-    return builder.build();
+    return null;
   }
 
   static List<Property> readProperties(Map<String, ExecutableElement> properties) {

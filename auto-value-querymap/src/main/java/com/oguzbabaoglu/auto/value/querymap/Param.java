@@ -3,7 +3,7 @@ package com.oguzbabaoglu.auto.value.querymap;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
@@ -11,7 +11,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  * the provided name value as its key name.
  */
 @Retention(SOURCE)
-@Target(TYPE)
+@Target(METHOD)
 public @interface Param {
 
   /**

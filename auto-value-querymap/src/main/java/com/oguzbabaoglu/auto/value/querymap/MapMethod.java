@@ -2,75 +2,57 @@ package com.oguzbabaoglu.auto.value.querymap;
 
 import com.google.auto.value.extension.AutoValueExtension;
 import com.google.common.collect.ImmutableSet;
-import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.processing.Messager;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
-import javax.tools.Diagnostic;
 
 import static javax.lang.model.element.Modifier.PUBLIC;
 
 class MapMethod {
-  private static final String METHOD_NAME = "toMap";
+  private static final String METHOD_NAME = "toQueryMap";
+  private static final ParameterizedTypeName METHOD_RETURN_TYPE = ParameterizedTypeName
+      .get(Map.class, String.class, String.class);
 
   static MethodSpec generateMethod(List<Property> properties) {
     MethodSpec.Builder builder = MethodSpec.methodBuilder(METHOD_NAME)
         .addModifiers(PUBLIC)
-        .returns(Map.class);
+        .addAnnotation(Override.class)
+        .returns(METHOD_RETURN_TYPE);
 
-    builder.addStatement("$T<$T, $T> map = new $T<>()", Map.class, String.class, Object.class, HashMap.class);
+    builder.addStatement("$T queryMap = new $T<>()", METHOD_RETURN_TYPE, LinkedHashMap.class);
     for (Property p : properties) {
-      builder.addStatement("map.put($S,$L())", p.humanName, p.methodName);
+      builder.addStatement("queryMap.put($S, $T.valueOf($L()))", p.keyValue, String.class, p.methodName);
     }
-    builder.addStatement("return map");
+    builder.addStatement("return queryMap");
 
     return builder.build();
   }
 
-  static Set<ExecutableElement> filteredAbstractMethods(AutoValueExtension.Context context) {
+  static Set<ExecutableElement> findDeclaredMethod(AutoValueExtension.Context context) {
     TypeElement type = context.autoValueClass();
-
-    // check that the class contains method: public abstract Map<String, Object> toMap() or Map toMap()
-    ParameterizedTypeName targetReturnType = ParameterizedTypeName.get(ClassName.get(Map.class), ClassName.get(String
-        .class), TypeName.OBJECT);
-    ImmutableSet.Builder<ExecutableElement> foundMethods = ImmutableSet.builder();
 
     for (ExecutableElement method : ElementFilter.methodsIn(type.getEnclosedElements())) {
       if (method.getModifiers().contains(Modifier.ABSTRACT) && method.getModifiers().contains(Modifier.PUBLIC)
           && method.getSimpleName().toString().equals(METHOD_NAME) && method.getParameters().size() == 0) {
         TypeMirror rType = method.getReturnType();
         TypeName returnType = TypeName.get(rType);
-        if (returnType.equals(targetReturnType)) {
-          foundMethods.add(method);
-          break;
-        }
-
-        if (returnType.equals(targetReturnType.rawType)) {
-          if (returnType instanceof ParameterizedTypeName) {
-            Messager messager = context.processingEnvironment().getMessager();
-            ParameterizedTypeName paramReturnType = (ParameterizedTypeName) returnType;
-            TypeName argument = paramReturnType.typeArguments.get(0);
-            messager.printMessage(Diagnostic.Kind.WARNING,
-                String.format("Found public static method returning Map<%s> instead of Map<String,Object>", argument));
-          } else {
-            foundMethods.add(method);
-          }
+        if (returnType.equals(METHOD_RETURN_TYPE)) {
+          return ImmutableSet.of(method);
         }
       }
     }
 
-    return foundMethods.build();
+    return ImmutableSet.of();
   }
 }
