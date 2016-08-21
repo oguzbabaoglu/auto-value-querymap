@@ -1,1 +1,1 @@
-include ':auto-value-toparam'
+include ':auto-value-querymap'
